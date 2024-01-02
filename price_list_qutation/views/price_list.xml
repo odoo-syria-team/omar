@@ -1,0 +1,31 @@
+
+<!-- <?xml version="1.0" encoding="UTF-8"?> -->
+<odoo>
+    <record id="pricelist_form_extensions" model="ir.ui.view">
+        <field name="name">pricelist_form_extensions</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="before">
+                <header>
+                    <button name="create_quotation" string="Create Quotation" type="object" class="oe_highlight"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet[1]/group[1]/group[1]/field[1]" position="before">
+                <field name="partner_id" />
+            </xpath>
+            <xpath expr="//tree[1]/field[1]" position="before">
+                <field name="to_select" />
+            </xpath>
+            <xpath expr="//tree[1]/field[@name='min_quantity']" position="before">
+                <field name="qty_on_hand" />
+            </xpath>
+            <xpath expr="//tree[1]/field[@name='min_quantity']" position="after">
+                <field name="qty_to_show" />
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

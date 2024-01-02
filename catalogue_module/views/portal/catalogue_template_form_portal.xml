@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_breadcrumb_my_product_form" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+
+            <li t-if="page_name == 'catalogue_form_page'" class="breadcrumb-item">
+                <a t-attf-href="/my/catalogue">
+                    Catalogues
+                </a>
+            </li>
+            <li t-if="page_name == 'catalogue_form_page'" class="breadcrumb-item">
+                <span t-field="o.name"/>
+            </li>
+        </xpath>
+    </template>
+
+
+    <template id="catalogue_form">
+        <t t-call="portal.portal_layout">
+
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Catalogue</t>
+            </t>
+            <t t-set="title">Catalogue</t>
+            <div class="oe_structure">
+                <div class="container">
+                    <div class="text-end p-3">
+                        <a class="btn btn-secondary"
+                           t-attf-href="/report/pdf/catalogue_module.catalogue_template_pdf/#{o.id}">Print
+                        </a>
+                    </div>
+
+                    <t t-call="catalogue_module.catalogue_template"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

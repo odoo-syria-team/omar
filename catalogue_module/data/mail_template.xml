@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="mail_template_product_approve" model="mail.template">
+            <field name="name">Email to Approve Product</field>
+            <field name="model_id" ref="model_product_template"/>
+            <field name="subject">Vendor Product Request Approve</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="email_from">"{{ user.name }}" &lt;{{ ( user.email) }}&gt;</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="email_cc">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
+            <field name="description">Sent to partner who requested to add/edit a product</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div>
+                        Dear <t t-esc="object.partner_id.name"/>,
+                    </div>
+                    <br/>
+                    <br/>
+                    <div>
+                        Your Product Request has been accepted successfully!
+                    </div>
+                    <br/>
+                    for more information please contact with us!
+                    <br/>
+                    <br/>
+                    Best Regards,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_partner_vendor" model="mail.template">
+            <field name="name">Email for Vendor Subscription</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="subject">Vendor Request Approve</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="email_from">"{{ user.name }}" &lt;{{ ( user.email) }}&gt;</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="email_cc">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
+            <field name="description">Sent to partner who requested to subscribe as vendor</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div>
+                        Dear <t t-esc="object.name"/>,
+                    </div>
+                    <br/>
+                    <br/>
+                    <div>
+                        Your Request to become vendor has been accepted successfully!
+                    </div>
+                    <br/>
+                    for more information please contact with us!
+                    <br/>
+                    <br/>
+                    Best Regards,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+        <record id="mail_template_partner_super_vendor" model="mail.template">
+            <field name="name">Email for Vendor+ Subscription</field>
+            <field name="model_id" ref="model_res_partner"/>
+            <field name="subject">Vendor+ Request Approve</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="email_from">"{{ user.name }}" &lt;{{ ( user.email) }}&gt;</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="email_cc">{{ (user.email_formatted or object.user_id.email_formatted) }}</field>
+            <field name="description">Sent to partner who requested to subscribe as vendor+</field>
+            <field name="body_html" type="html">
+                <div>
+                    <div>
+                        Dear <t t-esc="object.name"/>,
+                    </div>
+                    <br/>
+                    <br/>
+                    <div>
+                        Your Request to upgrade to become vendor+ has been accepted successfully!
+                    </div>
+                    <br/>
+                    for more information please contact with us!
+                    <br/>
+                    <br/>
+                    Best Regards,
+                    <br/>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>
