@@ -12,20 +12,22 @@
     # any module for this one to work correctly
     'depends': ['contacts', 'base', 'mail', 'web', 'website', 'stock', 'sale'],
     'assets': {
-        # 'web.assets_frontend': [
-        #     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css",
-        # ],
-
+        'web.assets_frontend': [
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js',
+            'catalogue_module/static/src/js/catalogue.js',
+        ],
     },
     # always loaded
     'data': [
         'views/sale_order.xml',
+        'views/price_list.xml',
         'views/portal/catalogue_template_form_portal.xml',
         'views/portal/catalogue_template_list_portal.xml',
         'views/portal/my_account_documents.xml',
         'report/report_info.xml',
         'report/catalogue_template.xml',
         'report/catalogue_template_pdf.xml',
+        "views/portal/sale_order_form_create_from_pricelist.xml",
 
     ],
 

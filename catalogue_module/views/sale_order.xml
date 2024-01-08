@@ -12,6 +12,9 @@
                 <button name="action_confirm_draft_catalogue" id="action_draft_catalogue" string="Draft" class="btn-secondary"
                         type="object" attrs="{'invisible': [('state', 'not in', ['catalogue'])]}"/>
             </xpath>
+            <xpath expr="//tree[1]/field[@name='product_uom_qty']" position="after">
+                <field name="max_qty" readonly="1"/>
+            </xpath>
         </field>
     </record>
 

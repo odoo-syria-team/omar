@@ -68,9 +68,8 @@ class CatalogueTemplate(portal.CustomerPortal):
             return str(e)
 
     # catalogue form view
-    @http.route('/my/catalogue/<int:catalogue_id>', auth="user", csrf=False, website=True,
-                methods=['GET'])
-    def get_product_record(self, catalogue_id, **post):
+    @http.route('/my/catalogue/<int:catalogue_id>', auth="user", csrf=False, website=True, methods=['GET', 'POST'])
+    def get_product_record(self, catalogue_id):
         try:
             user_catalogue_id = request.env['sale.order'].sudo().search(
                 [('id', '=', catalogue_id), ('partner_id', '=', request.env.user.partner_id.id)])
@@ -82,127 +81,192 @@ class CatalogueTemplate(portal.CustomerPortal):
         except Exception as e:
             return str(e)
 
-        # if request.httprequest.method == 'POST':
-        #     try:
-        #         data = self._write_vals()
-        #
-        #         if catalogue_id == -1:
-        #             user_product_id = request.env['sale.order'].sudo().create(
-        #                 {
-        #                     'name': data['name'],
-        #                     'partner_id': request.env.user.partner_id.id,
-        #                     'company_id': request.env.user.company_id.id,
-        #                     'product_state': 'approved' if request.env.user.partner_id.partner_type == 'super_vendor' else 'pending'
-        #                 })
-        #
-        #             if request.env.user.partner_id.partner_type == 'vendor':
-        #                 summary = _('New Product Request for %s', request.env.user.partner_id.name)
-        #                 note = _('%s is waiting his request to add new product to be approved',
-        #                          request.env.user.partner_id.name)
-        #             else:
-        #                 summary = _('Added product by %s', request.env.user.partner_id.name)
-        #                 note = _('%s has just added new product', request.env.user.partner_id.name)
-        #
-        #             self.send_notification_to_admin(user_product_id, note, summary)
-        #
-        #         else:
-        #             if not user_catalogue_id:
-        #                 raise AccessDenied()
-        #
-        #             summary = _('Product has been edited by %s', request.env.user.partner_id.name)
-        #             note = _('%s has just edited %s product', request.env.user.partner_id.name, data['name'])
-        #             self.delete_older_notification(user_catalogue_id)
-        #             self.send_notification_to_admin(user_catalogue_id, note, summary)
-        #
-        #         user_product_id.sudo().write(data)
-        #
-        #         return request.redirect('/my/products')
-        #
-        #     except UserError as e:
-        #         return str(e)
-        #     except Exception as e:
-        #         return str(e)
+        if request.httprequest.method == 'POST':
+            # try:
+            self._write_vals(user_catalogue_id)
+
+            return request.redirect('/my/catalogue')
+
+        # except UserError as e:
+        #     return str(e)
+        # except Exception as e:
+        #     return str(e)
 
         if request.httprequest.method == 'GET':
             try:
                 if catalogue_id != -1 and catalogue_id not in user_catalogue_id.ids:
                     raise AccessDenied()
 
+                product_ids = user_catalogue_id.pricelist_id.item_ids.mapped('product_tmpl_id').filtered(
+                    lambda product_id: product_id not in user_catalogue_id.order_line.mapped('product_template_id'))
+
                 return request.render('catalogue_module.catalogue_form', {
                     'user_id': request.env.user,
                     'page_name': 'catalogue_form_page',
                     'o': user_catalogue_id,
+                    'product_ids': product_ids,
                 })
             except UserError as e:
                 return str(e)
             except Exception as e:
                 return str(e)
 
-    def _write_vals(self):
+    def _write_vals(self, user_catalogue_id):
 
         form_dict = {}
-        form_file_dict = {}
-        products_vals = {}
-
         form = request.httprequest.form
 
+        catalogue_to_delete = []
+        line_id = 0
+        product_id = 0
         for key, value in zip(form.keys(), form.values()):
             form_dict[key] = form.getlist(key)
-
-        form_files = request.httprequest.files
-        for key, value in zip(form_files.keys(), form_files.values()):
-            form_file_dict[key] = form_files.getlist(key)
-
-        for key, value in zip(form_file_dict.keys(), form_file_dict.values()):
-            if key == 'product_image':
-                image_data = value[0].read()
-                if len(image_data) > 0 or form_dict['product_image_text'][0] == "deleted":
-                    products_vals['image_1920'] = base64.b64encode(image_data)
-
         for key, value in zip(form_dict.keys(), form_dict.values()):
+            catalogue_vals = {}
+            order_line_vals = {}
+            if 'delete' in key:
+                catalogue_to_delete.append(int(key.split('delete')[0]))
+                continue
 
-            if key == 'list_price':
-                products_vals[key] = float(value[0]) if value else 1.0
+            if 'product_uom_qty' in key:
+                if '-' in key:
+                    order_line_vals['product_uom_qty'] = value[0]
+                    product_id = int(key.split('-product_uom_qty')[0])
+                else:
+                    catalogue_vals['product_uom_qty'] = value[0]
+                    line_id = int(key.split('product_uom_qty')[0])
 
-            if key in ['name', 'description', 'barcode', 'default_code']:
-                products_vals[key] = value[0]
+            if 'price_unit' in key:
+                if '-' in key:
+                    order_line_vals['price_unit'] = value[0]
+                    product_id = int(key.split('-price_unit')[0])
+                else:
+                    catalogue_vals['price_unit'] = value[0]
+                    line_id = int(key.split('price_unit')[0])
+            if product_id != 0 and product_id not in user_catalogue_id.order_line.mapped('product_template_id').ids:
+                my_line = user_catalogue_id.pricelist_id.item_ids.filtered(
+                    lambda item: item.product_tmpl_id.id == product_id)
+                order_line = [(0, 0, {
+                    'order_id': user_catalogue_id.id,
+                    'product_template_id': product_id,
+                    'product_id': my_line.product_id.id,
+                    'product_uom_qty': order_line_vals['product_uom_qty'],
+                    'max_qty': my_line.qty_to_show,
+                    'product_uom': my_line.product_tmpl_id.uom_id.id,
+                    'name': my_line.product_tmpl_id.name,
+                    # 'price_unit': 1,
+                })]
+                user_catalogue_id.write({'order_line': order_line})
 
-        products_vals['sale_ok'] = True
-        products_vals['purchase_ok'] = False
-        products_vals['detailed_type'] = 'product'
-        products_vals['product_state'] = 'pending'
-        products_vals['categ_id'] = request.env.ref('product.product_category_1').id
+            elif product_id != 0 and product_id in user_catalogue_id.order_line.mapped('product_template_id').ids:
+                my_line = user_catalogue_id.order_line.filtered(
+                    lambda item: item.product_template_id.id == product_id)
+                my_line.sudo().write({'price_unit': order_line_vals['price_unit']})
 
-        return products_vals
+            [line.sudo().write(catalogue_vals) if line.id == line_id else None for line in user_catalogue_id.order_line]
 
-        # products_variant_vals = {}
-        # products_specification_vals = {}
-        # elif key.startswith('selected_value_ids_'):
-        #     variant_id = int(key.split('_')[3])
-        #     products_variant_vals.setdefault(variant_id, []).extend([int(val) for val in value])
-        #
-        # elif key.startswith('selected_specification_value_'):
-        #     specification_id = int(key.split('_')[3])
-        #     products_specification_vals[specification_id] = value[0]
-
-        # attribute_line_ids_updates = [(1, variant_id, {'value_ids': [(6, 0, value_ids)]}) for variant_id, value_ids in
-        #                               products_variant_vals.items()]
-        # specification_ids_updates = [(1, specification_id, {'value': value}) for specification_id, value in
-        #                              products_specification_vals.items()]
-
-        # products_vals["attribute_line_ids"] = attribute_line_ids_updates
-        # products_vals["specification_ids"] = specification_ids_updates
-
-        # print("products_vals----------------------------------", products_vals)
+        lines = request.env['sale.order.line'].sudo().browse(catalogue_to_delete)
+        if lines:
+            lines.sudo().unlink()
 
     @http.route('/download/catalogue', type='http', auth="user", website=True, methods=['GET'], csrf=False)
     def print_catalogue(self, catalogue_id):
-        print('=================', catalogue_id)
         user_catalogue_id = request.env['sale.order'].sudo().search(
-                [('id', '=', catalogue_id), ('partner_id', '=', request.env.user.partner_id.id)])
+            [('id', '=', catalogue_id), ('partner_id', '=', request.env.user.partner_id.id)])
         if user_catalogue_id:
             return user_catalogue_id.action_print_catalogue()
         else:
             return json.dumps([])
 
+    @http.route('/my/request/quotation/form/<int:catalogue_id>', type='http', auth="user", website=True,
+                methods=['GET'],
+                csrf=False)
+    def request_quotation(self, catalogue_id):
+        print('============', catalogue_id)
+        user_catalogue_id = request.env['sale.order'].sudo().search(
+            [('id', '=', catalogue_id), ('partner_id', '=', request.env.user.partner_id.id)])
+        if not user_catalogue_id:
+            raise AccessDenied()
+        rec_id = request.env['ir.model'].sudo().search([('model', '=', 'sale.order')], limit=1)
+        user_id = request.env['res.users'].sudo().search(
+            [('partner_id', '=', request.env.ref('base.partner_admin').id)])
+        summary = _('Partner Quotation Request')
+        note = _("Upgrade partner's Catalogue to Quotation")
 
+        notification_ids = request.env['mail.activity'].sudo().search([
+            ('activity_type_id', '=', 4),
+            ('user_id', '=', user_id.id),
+            ('res_model_id', '=', rec_id.id),
+            ('res_id', '=', catalogue_id)
+        ])
+        notification_ids.sudo().unlink()
+
+        request.env['mail.activity'].sudo().create({
+            'activity_type_id': 4,
+            'summary': summary,
+            'user_id': user_id.id,
+            'res_model_id': rec_id.id,
+            'res_id': catalogue_id,
+            'date_deadline': datetime.today(),
+            'note': note,
+        })
+
+        # user_catalogue_id.sudo().write({'state': 'draft'})
+        return request.redirect('/my/catalogue')
+
+    @http.route('/my/request/sale/form/<int:catalogue_id>', type='http', auth="user", website=True, methods=['GET'],
+                csrf=False)
+    def request_sale(self, catalogue_id):
+        user_catalogue_id = request.env['sale.order'].sudo().search(
+            [('id', '=', catalogue_id), ('partner_id', '=', request.env.user.partner_id.id)])
+        if not user_catalogue_id:
+            raise AccessDenied()
+
+        rec_id = request.env['ir.model'].sudo().search([('model', '=', 'sale.order')], limit=1)
+        user_id = request.env['res.users'].sudo().search(
+            [('partner_id', '=', request.env.ref('base.partner_admin').id)])
+        summary = _('Partner Sale Order Request')
+        note = _("Upgrade partner's Catalogue to Sale Order")
+
+        notification_ids = request.env['mail.activity'].sudo().search([
+            ('activity_type_id', '=', 4),
+            ('user_id', '=', user_id.id),
+            ('res_model_id', '=', rec_id.id),
+            ('res_id', '=', catalogue_id)
+        ])
+        notification_ids.sudo().unlink()
+
+        request.env['mail.activity'].sudo().create({
+            'activity_type_id': 4,
+            'summary': summary,
+            'user_id': user_id.id,
+            'res_model_id': rec_id.id,
+            'res_id': catalogue_id,
+            'date_deadline': datetime.today(),
+            'note': note,
+        })
+
+        # user_catalogue_id.sudo().action_confirm()
+        return request.redirect('/my/catalogue')
+
+    @http.route('/website/catalogue/available/products', type='http', auth="user", website=True, methods=['GET'],
+                csrf=False)
+    def catalogue_available_products(self, catalogue_id, products):
+        active_product_ids = products.translate({ord(i): None for i in '["]'}).split(',')
+        user_catalogue_id = request.env['sale.order'].search([('id', '=', catalogue_id)])
+        product_ids = user_catalogue_id.pricelist_id.item_ids.mapped('product_tmpl_id').filtered(
+            lambda product_id: str(product_id.id) not in active_product_ids)
+        if product_ids:
+            response_data = [
+                {
+                    'product_id': line.product_tmpl_id.id,
+                    'product_name': line.product_tmpl_id.name,
+                    'max_qty': line.qty_to_show,
+                    'price_unit': line.fixed_price,
+                }
+                for line in user_catalogue_id.pricelist_id.item_ids.filtered(
+                    lambda line: line.product_tmpl_id in product_ids)
+            ]
+            return json.dumps(response_data)
+        else:
+            return json.dumps([])
