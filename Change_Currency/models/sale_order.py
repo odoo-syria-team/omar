@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from .log import logger
 
 
 class SaleOrder(models.Model):
@@ -13,4 +14,7 @@ class SaleOrder(models.Model):
         for rec in self:
             rec.test = False
             account_move_lines = self.env['account.move.line'].search([('company_id', '=', rec.id)])
-            account_move_lines.company_currency_id = None
+
+            logger.debug(account_move_lines)
+            for re in account_move_lines:
+                re.company_currency_id = None
