@@ -1,0 +1,21 @@
+<odoo>
+    <record id="sale_order_form_inherit_state" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header[1]" position="inside">
+                <button name="action_catalogue" attrs="{'invisible': [('state', '!=', 'draft')]}"
+                        string="Add Catalogue" type="object" class="oe_highlight"/>
+                <button name="action_confirm" id="action_confirm_catalogue" string="Confirm" class="btn-primary"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['catalogue'])]}"/>
+                <button name="action_confirm_draft_catalogue" id="action_draft_catalogue" string="Draft" class="btn-secondary"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['catalogue'])]}"/>
+            </xpath>
+            <xpath expr="//tree[1]/field[@name='product_uom_qty']" position="after">
+                <field name="max_qty" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

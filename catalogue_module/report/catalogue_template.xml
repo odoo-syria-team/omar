@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="catalogue_template">
+        <center>
+            <div class="card-header p-5" style="background: #0000cc; width: 90%; height: 200px; color: white;">
+                <h1>Product Catalogue</h1>
+            </div>
+        </center>
+        <div style="width: 100%;">
+            <center>
+                <table class="table table-borderless mt-5 p-2">
+                    <t t-set="line_index" t-value="1"/>
+                    <tr>
+                        <t t-foreach="o.order_line" t-as="line">
+                            <t t-if="(line_index % 3) == 0">
+                                <tr/>
+                            </t>
+                            <td style="height: 100px; width: 30%;">
+                                <t t-set="line_index" t-value="line_index + 1"/>
+                                <center style="background: #edf5ff; border-radius: 0px; border: 0px solid #0000cc; height: 100%; width: 100%;">
+                                    <img class="p-2" id="image_preview" style="width: 95%;" alt=""
+                                         t-attf-src="data:image/*;base64,{{line.product_template_id.image_1920}}"/>
+                                    <div style="font-weight: normal;" class="p-2" t-field="line.product_template_id.name"/>
+                                    <div style="font-weight: bold; font-size: 10pt;">
+                                        <b>Price Per Unit:</b>
+                                        <b t-field="line.price_unit"/>
+                                        <b t-field="line.order_id.currency_id.symbol"/>
+                                    </div>
+
+                                    <div style="font-weight: normal; font-size: 10pt;">
+                                        <span>Quantity:</span>
+                                        <span t-field="line.product_uom_qty"/>
+                                    </div>
+                                    <div style="font-weight: normal; font-size: 10pt;" class="p-2" t-field="line.name"/>
+                                </center>
+                            </td>
+                        </t>
+                    </tr>
+                </table>
+            </center>
+        </div>
+
+        <div style="width: 100%;">
+            <center>
+                <div class="mt-5" style="background: #0000cc; height: 5px; width: 100%;"/>
+                <h4 class="mt-5" t-field="o.company_id"/>
+                <div class="mt-4" style="font-size: 6pt; font-weight: 100;">
+                    <b style="font-size: 7pt;">Address:</b>
+                    <span t-field="o.company_id.street" t-if="o.company_id.street"/>
+                    <span t-field="o.company_id.street2" t-if="o.company_id.street2"/>
+                    <span t-field="o.company_id.city" t-if="o.company_id.city"/>
+                    <span t-field="o.company_id.state_id" t-if="o.company_id.state_id"/>
+                    <span t-field="o.company_id.zip" t-if="o.company_id.zip"/>
+                    <span t-field="o.company_id.country_id" t-if="o.company_id.country_id"/>
+                    -
+                    <b style="font-size: 7pt;">Phone:</b>
+                    <span t-field="o.company_id.phone" t-if="o.company_id.phone"/>
+                    <span t-field="o.company_id.mobile" t-if="o.company_id.mobile"/>
+                    -
+                    <b style="font-size: 7pt;">Email:</b>
+                    <span t-field="o.company_id.email" t-if="o.company_id.email"/>
+                    -
+                    <b style="font-size: 7pt;">Website:</b>
+                    <span t-field="o.company_id.website" t-if="o.company_id.website"/>
+                </div>
+            </center>
+        </div>
+
+
+    </template>
+
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="catalogue_template_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-call="catalogue_module.catalogue_template"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

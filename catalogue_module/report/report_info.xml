@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="catalogue_sale_order_report" model="ir.actions.report">
+        <field name="name">Catalogue</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">catalogue_module.catalogue_template_pdf</field>
+        <field name="report_file">catalogue_module.catalogue_template_pdf</field>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="product.paperformat_label_sheet"/>
+    </record>
+
+</odoo>
