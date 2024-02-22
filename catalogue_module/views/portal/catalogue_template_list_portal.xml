@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_breadcrumb_my_product_list" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'catalogue_list_page'" class="breadcrumb-item">
+                Catalogue
+            </li>
+        </xpath>
+    </template>
+
+    <template id="catalogue_list">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Catalogue</t>
+            </t>
+            <t t-set="title">Catalogue</t>
+            <div class="oe_structure">
+                <div style="text-align:end;">
+                    <div class="btn btn-light fa fa-list" onclick="view('list_view', 'kanban_view');"/>
+                    <div class="btn btn-light oi oi-view-kanban" onclick="view('kanban_view', 'list_view');"/>
+                    <script>
+                        function view(curr, next){
+                            let show = document.getElementById(curr);
+                            let hide = document.getElementById(next);
+                            show.style.display = 'grid';
+                            hide.style.display = 'none';
+                        }
+                    </script>
+                </div>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <a style="display: none;" id="new_quotation" class="btn btn-primary m-2 mb-3" href="/new/catalogue">New</a>
+
+                <script>
+                    $.ajax({
+                        url: '/my/pricelist/available',
+                        data: {},
+                        dataType: 'json',
+                        success: function(data) {
+                            console.log('success', data[0].display);
+                            if (data[0].display == 1){
+                                document.getElementById('new_quotation').style.display = 'inline-block';
+                            }
+                            else if (data[0].display == 0){
+                                document.getElementById('new_quotation').style.display = 'none';
+                            }
+                        },
+                        error: function (error) {
+                            console.log(`Error ${error}`);
+                        }
+                    });
+                </script>
+
+
+<!--                <a class="btn btn-primary m-2" t-attf-href="/my/catalogue/-1">-->
+<!--                    New-->
+<!--                </a>-->
+
+                <div id="list_view" style="display: grid;" class="container mt-1">
+                    <t t-call="portal.portal_table">
+                        <tr style="background-color: ghostwhite; line-height: 1.5;">
+                            <th style="padding-left:10px; border-bottom: solid #d9d9d9 1px;">
+                                Catalogue Name
+                            </th>
+                            <th style="border-bottom: solid #d9d9d9 1px;">
+                                Customer
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th/>
+                        </tr>
+                        <t t-foreach="catalogue_ids" t-as="catalogue">
+                            <tr>
+                                <td style="padding-left: 10px; border-bottom: solid #d9d9d9 1px;">
+                                    <a t-attf-href="/my/catalogue/{{catalogue.id}}">
+                                        <div t-field="catalogue.name"/>
+                                    </a>
+
+                                </td>
+                                <td style="border-bottom: solid #d9d9d9 1px;">
+                                    <div t-field="catalogue.partner_id"/>
+                                </td>
+                                <td style="border-bottom: solid #d9d9d9 1px;">
+                                    <div t-field="catalogue.amount_total"/>
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-secondary" t-attf-href="/report/pdf/catalogue_module.catalogue_template_pdf/#{catalogue.id}">Print</a>
+                                </td>
+                            </tr>
+                        </t>
+                    </t>
+                </div>
+
+                <div id="kanban_view" class="row mt-1"
+                     style="display: none;
+                            grid-template-columns: repeat(auto-fill, minmax(325px, 1fr));
+                            grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
+                            gap: 1rem;">
+                    <t t-foreach="catalogue_ids" t-as="catalogue">
+
+                        <a class="btn p-1 container text-start" t-attf-href="/my/catalogue/{{catalogue.id}}" style="background: white; border-radius: 5px; border: 1px solid #dee2e6; width: 100%; height: 100px;">
+                            <h5 class="p-1" style="font-weight: bold;" t-esc="catalogue.name"/>
+                            <hr style="margin-top: -7px; font-weight: normal;"/>
+                            <div class="p-1">
+                                <div style="margin-top: -15px; font-weight: normal;">
+                                    <b>Customer:</b> <span t-field="catalogue.partner_id"/>
+                                </div>
+                                <div style="font-weight: normal;">
+                                    <b>Total:</b> <span t-field="catalogue.amount_total"/>
+                                </div>
+                            </div>
+
+                        </a>
+
+                    </t>
+                </div>
+
+            </div>
+        </t>
+    </template>
+</odoo>
