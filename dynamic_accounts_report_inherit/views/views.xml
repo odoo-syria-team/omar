@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+
+        <record id="dynamic_accounts_report.menu_partner_ledger" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+
+        <record id="action_partner_ledger_custom" model="ir.actions.client">
+            <field name="name">Partner Ledger New</field>
+            <field name="tag">p_l_2</field>
+        </record>
+        <menuitem id="menu_partner_ledger_custom"  action="action_partner_ledger_custom"
+              name="Partner Ledger" parent="dynamic_accounts_report.dynamic_report_accounting"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,6 @@
+<templates>
+    <t t-name="inherit_PLTable" t-inherit="PLTable">
+        <div class="test"/>
+    </t>
+
+</templates>

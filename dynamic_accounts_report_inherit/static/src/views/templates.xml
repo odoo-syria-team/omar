@@ -1,0 +1,44 @@
+<templates>
+    <t t-name="PartnerTemp_custom">
+        <div class="">
+            <div class="">
+                <h1 style="padding:10px">
+                    Partner Ledger new
+                </h1>
+            </div>
+            <div>
+                <div class="filter_view_tb"/>
+            </div>
+            <br/>
+            <div>
+                <div class="table_view_tb" style="right:20px;"/>
+            </div>
+        </div>
+    </t>
+</templates>
+
+<!-- // odoo.define('dynamic_accounts_report_inherit.partner_ledger_inherit', function(require) {
+    //     "use strict";
+    
+    //     const ControlPanelModelExtension = require('dynamic_accounts_report/static/src/js/partner_ledger.js');
+    
+    //     // function _getAutoCompletionFilterDomain(filter, filterQueryElements) {
+    //     //     // your custom implementation here
+    //     // }
+    // 	console.log('==============================')
+    // 	function format_currency(currency, amount) {
+    // 		console.log('==============================')
+    // 		if (typeof(amount) != 'number') {
+    // 			amount = parseFloat(amount);
+    // 		}
+    // 		var formatted_value = (amount).toLocaleString(currency[2], {
+    // 			minimumFractionDigits: 8
+    // 		})
+    // 		return formatted_value
+    // 	}
+    
+    //     ControlPanelModelExtension.prototype.format_currency = format_currency;
+    
+    //     return ControlPanelModelExtension;
+    // });
+     -->
