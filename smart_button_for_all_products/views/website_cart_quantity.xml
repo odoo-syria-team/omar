@@ -1,0 +1,28 @@
+<odoo>
+    <template id="custom_home" inherit_id="website_sale.cart_lines">
+        <xpath expr="//input[@type='text'][hasclass('quantity')]" position="after">
+            <div style="display: none;" t-esc="line.product_max_quantity"/>
+            <script>
+                function change_method(self){
+                    if(parseInt(self.value) &gt;= parseInt(self.nextElementSibling.innerText)){
+                        self.value = self.nextElementSibling.innerText;
+                    }
+                 }
+            </script>
+        </xpath>
+        <xpath expr="//input[@type='text'][hasclass('quantity')]" position="attributes">
+            <attribute name="onchange">change_method(this)</attribute>
+            <attribute name="data-max" t-attf="%.0f" t-value="line.product_max_quantity"/>
+        </xpath>
+        <!-- <xpath expr="//div[@id='add_to_cart_wrap']" position="replace"/> -->
+    </template>
+
+    
+
+    <template id ='custome_quantity' inherit_id="website_sale.product_quantity" name="Select Quantity">
+            
+          <xpath expr="//*[@id='o_wsale_cta_wrapper']/div[1]" position="replace">
+
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <!-- Action for stock moves -->
+        <record id="action_sale_order_stock_moves" model="ir.actions.act_window">
+            <field name="name">Stock Moves</field>
+            <field name="res_model">stock.move</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('sale_line_id.order_id', '=', active_id)]</field>
+        </record>
+
+        <!-- Button definition in sale order form view -->
+        <record id="view_sale_order_form_inherit_stock_moves" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit.stock.moves</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_cancel']" position="after">
+                    <button name="%(action_sale_order_stock_moves)d" string="View Stock Moves" type="action"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="view_move_tree_inherit" model="ir.ui.view">
+            <field name="name">stock.move.tree.inherit</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_tree_receipt_picking"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="product_price" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

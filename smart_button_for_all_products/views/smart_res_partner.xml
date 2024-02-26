@@ -1,0 +1,32 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="res_partner_form_view_inherited">
+            <field name="name">res.partner.form.inherited</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//button[@class='oe_stat_button'][1]" position="after">
+                    <button class="oe_stat_button" name="open_sale_order_products" type="object"
+                        icon="fa-shopping-cart"
+                    >
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="counter_products" widget="statinfo" nolabel="1" class="mr4" />
+                            </span>
+                            <span class="o_stat_text">Products in sale orders</span>
+                        </div>
+                    </button>
+                </xpath>
+                <!-- <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="open_sale_order_products" string="Products in Sale Orders"
+                            type="object" class="oe_stat_button" />
+                    </header>
+                </xpath> -->
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

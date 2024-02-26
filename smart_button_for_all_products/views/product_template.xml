@@ -1,0 +1,17 @@
+<odoo>
+    <record id="product_template_form_fanoos" model="ir.ui.view">
+        <field name="name">product_template_form_fanoos</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="arch" type="xml">
+            
+            <xpath expr="//group[@name='group_lots_and_weight']" position="inside">
+                <label for="dimension" />
+                <div name="dimension">
+                    <field name="dimension"/>
+                </div>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>

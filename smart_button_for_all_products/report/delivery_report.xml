@@ -1,0 +1,11 @@
+<odoo>
+    <record id="action_delivery_report_card" model="ir.actions.report">
+        <field name="name">Delivery Report</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">smart_button_for_all_products.Delivery_report_card</field>
+        <field name="report_file">smart_button_for_all_products.Delivery_report_card</field>
+        <field name="print_report_name">'Delivery Report'</field>
+        <field name="binding_model_id" ref="model_sale_order"/>
+     </record>
+</odoo>
